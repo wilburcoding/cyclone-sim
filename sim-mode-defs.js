@@ -1,11 +1,12 @@
 // ---- Simulation Modes ---- //
 
-const SIMULATION_MODES = ['Normal','Hyper','Wild','Megablobs','Experimental']; // Labels for sim mode selector UI
+const SIMULATION_MODES = ['Normal','Hyper','Wild','Megablobs','Experimental','Extreme']; // Labels for sim mode selector UI
 const SIM_MODE_NORMAL = 0;
 const SIM_MODE_HYPER = 1;
 const SIM_MODE_WILD = 2;
 const SIM_MODE_MEGABLOBS = 3;
 const SIM_MODE_EXPERIMENTAL = 4;
+const SIM_MODE_EXTREME = 5;
 
 // ---- Active Attributes ---- //
 
@@ -39,7 +40,7 @@ SPAWN_RULES[SIM_MODE_HYPER] = {};
 SPAWN_RULES[SIM_MODE_WILD] = {};
 SPAWN_RULES[SIM_MODE_MEGABLOBS] = {};
 SPAWN_RULES[SIM_MODE_EXPERIMENTAL] = {};
-
+SPAWN_RULES[SIM_MODE_EXTREME] = {};
 // -- Defaults -- //
 
 SPAWN_RULES.defaults.archetypes = {
@@ -264,9 +265,59 @@ SPAWN_RULES[SIM_MODE_EXPERIMENTAL].archetypes = {
         kaboom: 0.2
     }
 };
+SPAWN_RULES[SIM_MODE_EXPERIMENTAL].archetypes = {
+    'tw': {
+        x: ()=>random(0,WIDTH-1),
+        y: (b)=>b.hemY(random(HEIGHT*0.7,HEIGHT*0.9)),
+        pressure: [1000, 1020],
+        windSpeed: [15, 35],
+        type: TROPWAVE,
+        organization: [0,1],
+        lowerWarmCore: 1,
+        upperWarmCore: 1,
+        depth: 0,
+        kaboom: 0
+    },
+    'ex': {
+        x: ()=>random(0,WIDTH-1),
+        y: (b,x)=>b.hemY(b.env.get("jetstream",x,0,b.tick)+random(-75,75)),
+        pressure: [1000, 1020],
+        windSpeed: [15, 35],
+        type: EXTROP,
+        organization: 0,
+        lowerWarmCore: 0,
+        upperWarmCore: 0,
+        depth: 1,
+        kaboom: 0
+    },
+    'tc': {
+        pressure: 1005,
+        windSpeed: 25,
+        type: TROP,
+        organization: 1,
+        lowerWarmCore: 1,
+        upperWarmCore: 1,
+        depth: 0,
+        kaboom: 0.2
+    },
+    'l': {
+        inherit: 'tw',
+        pressure: 1015,
+        windSpeed: 15,
+        organization: 0.2,
+        kaboom: 0.2
+    },
+    'x': {
+        inherit: 'ex',
+        pressure: 1005,
+        windSpeed: 15,
+        kaboom: 0.2
+    }
+};
 
 SPAWN_RULES[SIM_MODE_EXPERIMENTAL].doSpawn = SPAWN_RULES[SIM_MODE_HYPER].doSpawn;
 
+SPAWN_RULES[SIM_MODE_EXTREME].doSpawn = SPAWN_RULES[SIM_MODE_HYPER].doSpawn;
 
 // ---- Definitions of Environmental Fields ---- //
 
@@ -278,7 +329,7 @@ ENV_DEFS[SIM_MODE_HYPER] = {}; // Same for "Hyper" simulation mode
 ENV_DEFS[SIM_MODE_WILD] = {};  // "Wild" simulation mode
 ENV_DEFS[SIM_MODE_MEGABLOBS] = {}; // "Megablobs" simulation mode
 ENV_DEFS[SIM_MODE_EXPERIMENTAL] = {}; // "Experimental" simulation mode
-
+ENV_DEFS[SIM_MODE_EXTREME] = {}
 // -- Sample Env Field -- //
 
 // ENV_DEFS.defaults.sample = {
@@ -363,7 +414,7 @@ ENV_DEFS[SIM_MODE_MEGABLOBS].jetstream = {
     }
 };
 ENV_DEFS[SIM_MODE_EXPERIMENTAL].jetstream = {};
-
+ENV_DEFS[SIM_MODE_EXTREME].jetstream = {};
 // -- LLSteering -- //
 
 ENV_DEFS.defaults.LLSteering = {
@@ -431,7 +482,7 @@ ENV_DEFS[SIM_MODE_WILD].LLSteering = {
 };
 ENV_DEFS[SIM_MODE_MEGABLOBS].LLSteering = {};
 ENV_DEFS[SIM_MODE_EXPERIMENTAL].LLSteering = {};
-
+ENV_DEFS[SIM_MODE_EXTREME].LLSteering = {}
 // -- ULSteering -- //
 
 ENV_DEFS.defaults.ULSteering = {
@@ -537,7 +588,7 @@ ENV_DEFS[SIM_MODE_WILD].ULSteering = {
 };
 ENV_DEFS[SIM_MODE_MEGABLOBS].ULSteering = {};
 ENV_DEFS[SIM_MODE_EXPERIMENTAL].ULSteering = {};
-
+ENV_DEFS[SIM_MODE_EXTREME].ULSteering = {};
 // -- shear -- //
 
 ENV_DEFS.defaults.shear = {
@@ -578,7 +629,7 @@ ENV_DEFS[SIM_MODE_HYPER].shear = {};
 ENV_DEFS[SIM_MODE_WILD].shear = {};
 ENV_DEFS[SIM_MODE_MEGABLOBS].shear = {};
 ENV_DEFS[SIM_MODE_EXPERIMENTAL].shear = {};
-
+ENV_DEFS[SIM_MODE_EXTREME].shear = {};
 // -- SSTAnomaly -- //
 
 ENV_DEFS.defaults.SSTAnomaly = {
@@ -689,7 +740,7 @@ ENV_DEFS.defaults.SST = {
     modifiers: {
         offSeasonPolarTemp: -3,
         peakSeasonPolarTemp: 10,
-        offSeasonTropicsTemp: 26,
+        offSeasonTropicsTemp: 20,
         peakSeasonTropicsTemp: 29
     }
 };
@@ -726,6 +777,15 @@ ENV_DEFS[SIM_MODE_EXPERIMENTAL].SST = {
         peakSeasonPolarTemp: 22,
         offSeasonTropicsTemp: 26,
         peakSeasonTropicsTemp: 28
+    }
+};
+ENV_DEFS[SIM_MODE_EXTREME].SST = {
+    version:1,
+    modifiers: {
+        offSeasonPolarTemp: 20,
+        peakSeasonPolarTemp: 30,
+        offSeasonTropicsTemp: 50,
+        peakSeasonTropicsTemp: 80
     }
 };
 
@@ -792,7 +852,7 @@ ENV_DEFS[SIM_MODE_WILD].moisture = {
 };
 ENV_DEFS[SIM_MODE_MEGABLOBS].moisture = {};
 ENV_DEFS[SIM_MODE_EXPERIMENTAL].moisture = {};
-
+ENV_DEFS[SIM_MODE_EXTREME].moisture = {};
 // ---- Active Storm System Algorithm ---- //
 
 const STORM_ALGORITHM = {};
@@ -803,7 +863,7 @@ STORM_ALGORITHM[SIM_MODE_HYPER] = {};
 STORM_ALGORITHM[SIM_MODE_WILD] = {};
 STORM_ALGORITHM[SIM_MODE_MEGABLOBS] = {};
 STORM_ALGORITHM[SIM_MODE_EXPERIMENTAL] = {};
-
+STORM_ALGORITHM[SIM_MODE_EXTREME] = {};
 // -- Steering -- //
 
 STORM_ALGORITHM.defaults.steering = function(sys,vec,u){
@@ -986,7 +1046,7 @@ STORM_ALGORITHM[SIM_MODE_HYPER].version = 0;
 STORM_ALGORITHM[SIM_MODE_WILD].version = 0;
 STORM_ALGORITHM[SIM_MODE_MEGABLOBS].version = 0;
 STORM_ALGORITHM[SIM_MODE_EXPERIMENTAL].version = 1;
-
+STORM_ALGORITHM[SIM_MODE_EXTREME].version = 0;
 // -- Upgrade -- //
 // Converts active attributes in case an active system is loaded after an algorithm change breaks old values
 
